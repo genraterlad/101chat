@@ -1,0 +1,107 @@
+CREATE DATABASE chatroom;
+USE chatroom;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+<?php
+// Connect to the database (add your database credentials)
+$connection = new mysqli('localhost', 'username', 'password', 'chatroom');
+
+if ($connection->connect_error) {
+    die('Connection failed: ' . $connection->connect_error);
+}
+
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+
+    // Insert user into the 'users' table
+    $query = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
+    
+    if ($connection->query($query) === TRUE) {
+        echo 'Registration successful!';
+    } else {
+        echo 'Error: ' . $connection->error;
+    }
+}
+
+$connection->close();
+?>
+<?php
+// Connect to the database (add your database credentials)
+$connection = new mysqli('localhost', 'username', 'password', 'chatroom');
+
+if ($connection->connect_error) {
+    die('Connection failed: ' . $connection->connect_error);
+}
+
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Retrieve user from the 'users' table
+    $query = "SELECT * FROM users WHERE username = '$username'";
+    $result = $connection->query($query);
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            echo 'Login successful!';
+        } else {
+            echo 'Invalid password';
+        }
+    } else {
+        echo 'User not found';
+    }
+}
+
+$connection->close();
+?>
+<?php
+// Connect to the database (add your database credentials)
+$connection = new mysqli('localhost', 'username', 'password', 'chatroom');
+
+if ($connection->connect_error) {
+    die('Connection failed: ' . $connection->connect_error);
+}
+
+if (isset($_POST['user_id']) && isset($_POST['message'])) {
+    $user_id = $_POST['user_id'];
+    $message = $_POST['message'];
+
+    // Insert chat message into the 'messages' table
+    $query = "INSERT INTO messages (user_id, message) VALUES ('$user_id', '$message')";
+
+    if ($connection->query($query) === TRUE) {
+        echo 'Message sent!';
+    } else {
+        echo 'Error: ' . $connection->error;
+    }
+}
+
+$connection->close();
+?>
+<!-- wp:template-part {"slug":"header","theme":"pub/creatio-2"} /-->
+
+<!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|60"}}},"layout":{"type":"default"}} -->
+<div class="wp-block-group" style="padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--60)"><!-- wp:query {"queryId":0,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[]},"tagName":"main","layout":{"type":"constrained","wideSize":"1200px"}} -->
+<main class="wp-block-query"><!-- wp:group {"align":"wide","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignwide"><!-- wp:query-pagination {"align":"wide","layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous /-->
+
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination --></div>
+<!-- /wp:group --></main>
+<!-- /wp:query --></div>
+<!-- /wp:group -->
+{"slug":"footer","theme":"pub/creatio-2"} /-->
